@@ -1,5 +1,5 @@
 use crate::error;
-use rumqttc::{self, Key, LastWill, MqttOptions, TlsConfiguration, Transport};
+use rumqttc::{self, LastWill, MqttOptions, TlsConfiguration, Transport};
 use std::time::Duration;
 
 #[derive(Clone, Debug)]
@@ -9,13 +9,11 @@ pub struct MQTTMaxPacketSize {
 }
 
 impl MQTTMaxPacketSize {
-    pub fn new(
-        incoming_max_packet_size: usize,
-        outgoing_max_packet_size: usize) -> Self {
-
+    pub fn new(incoming_max_packet_size: usize, outgoing_max_packet_size: usize) -> Self {
         MQTTMaxPacketSize {
             incoming_max_packet_size,
-            outgoing_max_packet_size}
+            outgoing_max_packet_size,
+        }
     }
 }
 
@@ -96,10 +94,9 @@ fn set_overrides(settings: AWSIoTSettings) -> MqttOptions {
             mqtt_options.set_last_will(last_will);
         }
         if let Some(conn_timeout) = overrides.conn_timeout {
-            mqtt_options.set_connection_timeout(conn_timeout);
+            // mqtt_options.set_connection_timeout(conn_timeout);
         }
     }
-
 
     mqtt_options
 }
@@ -123,7 +120,7 @@ pub(crate) async fn get_mqtt_options_async(
         Transport::Tls(TlsConfiguration::Simple {
             ca,
             alpn: None,
-            client_auth: Some((client_cert, Key::RSA(client_key))),
+            client_auth: Some((client_cert, client_key)),
         })
     });
 

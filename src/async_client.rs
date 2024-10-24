@@ -1,8 +1,8 @@
 use crate::error;
 use crate::settings::{get_mqtt_options_async, AWSIoTSettings};
+// use flume::Sender as RumqttcSender;
 use rumqttc::{
     self, AsyncClient, ClientError, ConnectionError, Event, EventLoop, Incoming, QoS, Request,
-    Sender as RumqttcSender,
 };
 use tokio::sync::broadcast::{self, Receiver, Sender};
 
@@ -27,7 +27,7 @@ pub async fn async_event_loop_listener(
 
 pub struct AWSIoTAsyncClient {
     client: AsyncClient,
-    eventloop_handle: RumqttcSender<Request>,
+    // eventloop_handle: RumqttcSender<Request>,
     incoming_event_sender: Sender<Incoming>,
 }
 
@@ -42,11 +42,11 @@ impl AWSIoTAsyncClient {
 
         let (client, eventloop) = AsyncClient::new(mqtt_options, 10);
         let (request_tx, _) = broadcast::channel(50);
-        let eventloop_handle = eventloop.handle();
+        //let eventloop_handle = eventloop.clone();
         Ok((
             AWSIoTAsyncClient {
                 client,
-                eventloop_handle,
+                //eventloop_handle,
                 incoming_event_sender: request_tx.clone(),
             },
             (eventloop, request_tx),
@@ -69,9 +69,9 @@ impl AWSIoTAsyncClient {
 
     /// Get an eventloop handle that can be used to interract with the eventloop. Not needed if you
     /// are only using client.publish and client.subscribe.
-    pub async fn get_eventloop_handle(&self) -> RumqttcSender<Request> {
-        self.eventloop_handle.clone()
-    }
+    // pub async fn get_eventloop_handle(&self) -> RumqttcSender<Request> {
+    //     self.eventloop_handle.clone()
+    // }
 
     /// Get a receiver of the incoming messages. Send this to any function that wants to read the
     /// incoming messages from IoT Core.
